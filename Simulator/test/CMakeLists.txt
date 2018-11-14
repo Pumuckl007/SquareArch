@@ -3,7 +3,7 @@ project(SquareArchSim_tests)
 
 include_directories(${SQUARE_ARCH_HEADERS_DIR})
 
-set(SOURCE_FILES test_maxint.c)
+set(SOURCE_FILES test_main.c)
 
 add_executable(SquareArchSim_tests ${SOURCE_FILES})
 

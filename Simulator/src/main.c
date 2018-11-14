@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "maxint.c"
+#include "node.c"
 
 int main(int argc, const char* argv[]){
-  printf("Hello World%i\n", maxi(2,3));
+  printf("Hello World\n");
 }
