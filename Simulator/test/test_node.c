@@ -53,6 +53,56 @@ void test_getNodeOutput(void){
   CU_ASSERT_EQUAL_FATAL(retVal, 31);
 }
 
+void test_updateAllNodes(void){
+  char bank1[3][3] = {
+    { 0b00000, 0b00100, 0b00000 },
+    { 0b01000, 0b00001, 0b00010 },
+    { 0b00000, 0b10000, 0b00000 }
+  };
+
+  char bank2[3][3] = {
+    { 0b00000, 0b00000, 0b00000 },
+    { 0b00000, 0b00000, 0b00000 },
+    { 0b00000, 0b00000, 0b00000 }
+  };
+
+  char externalData[12] = {
+    0, 0, 0,
+    0,
+    0,
+    1,
+    0, 0, 0,
+    0,
+    0,
+    0
+  };
+
+  char luts[3][3][32] = {
+    {OFF_GATE, OFF_GATE, OFF_GATE},
+    {ON_GATE, OR_GATE, OFF_GATE},
+    {OFF_GATE, OFF_GATE, OR_GATE}
+  };
+  struct Node nodes[3][3];
+  struct DieInfo info;
+  info.xMax = 3;
+  info.yMax = 3;
+  info.nodes = (struct Node*)&nodes;
+  info.bankA = (char*)&bank1;
+  info.bankB = (char*)&bank2;
+  info.externalData = (char*) &externalData;
+  initNodes((char*)luts, &info);
+
+  updateAllNodes(&info, info.bankA, info.bankB);
+
+  char results[3][3] = {
+    { 0b00000, 0b00000, 0b00000 },
+    { 0b11111, 0b11111, 0b00000 },
+    { 0b00000, 0b00000, 0b11111 }
+  };
+  CU_ASSERT_NSTRING_EQUAL(info.bankB, &results, 9);
+
+}
+
 void test_initNodes(void){
   char luts[1][32] = { AND_GATE };
 
@@ -104,6 +154,11 @@ int testNode () {
   }
 
   if (NULL == CU_add_test(pSuite, "Test Init Nodes", test_initNodes)) {
+    CU_cleanup_registry();
+    return CU_get_error();
+  }
+
+  if (NULL == CU_add_test(pSuite, "Test Update Nodes", test_updateAllNodes)) {
     CU_cleanup_registry();
     return CU_get_error();
   }

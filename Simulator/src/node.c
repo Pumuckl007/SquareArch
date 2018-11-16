@@ -48,6 +48,14 @@ char getNodeOutput(struct Node* node, struct DieInfo* info, char* resultMap){
   return node->lut[total];
 }
 
+int updateAllNodes(struct DieInfo* info, char* readBank, char* writeBank){
+  for(int i = 0; i<info->xMax * info->yMax; i++){
+    struct Node* currentNode = info->nodes + i;
+    writeBank[i] = getNodeOutput(currentNode, info, readBank);
+  }
+  return 0;
+}
+
 int initNodes(char* luts, struct DieInfo* info){
   for(int w = 0; w<info->xMax; w++) {
     for(int h = 0; h<info->yMax; h++) {
