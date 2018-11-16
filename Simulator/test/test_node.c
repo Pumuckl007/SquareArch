@@ -34,22 +34,22 @@ void test_getNodeOutput(void){
     {OFF_GATE, OFF_GATE, OR_GATE}
   };
   struct Node nodes[3][3];
-  struct DieInfo* info;
-  info->xMax = 3;
-  info->yMax = 3;
-  info->nodes = nodes;
-  info->bankA = bank1;
-  info->bankB = bank2;
-  info->externalData = externalData;
-  initNodes((char*)luts, info);
+  struct DieInfo info;
+  info.xMax = 3;
+  info.yMax = 3;
+  info.nodes = (struct Node*)&nodes;
+  info.bankA = (char*)&bank1;
+  info.bankB = (char*)&bank2;
+  info.externalData = (char*) &externalData;
+  initNodes((char*)luts, &info);
 
-  char retVal = getNodeOutput(&nodes[1][1], info, bank1);
+  char retVal = getNodeOutput(&(nodes[1][1]), &info, (char*)&bank1);
   CU_ASSERT_EQUAL_FATAL(retVal, 31);
 
-  retVal = getNodeOutput(&nodes[0][0], &bank1[0][0], (char*)externalData);
+  retVal = getNodeOutput(&(nodes[0][0]), &info, (char*)&bank1);
   CU_ASSERT_EQUAL_FATAL(retVal, 0);
 
-  retVal = getNodeOutput(&nodes[2][2], &bank1[0][0], (char*)externalData);
+  retVal = getNodeOutput(&(nodes[2][2]), &info, (char*)&bank1);
   CU_ASSERT_EQUAL_FATAL(retVal, 31);
 }
 
@@ -57,7 +57,11 @@ void test_initNodes(void){
   char luts[1][32] = { AND_GATE };
 
   struct Node nodes[1][1];
-  int retVal = initNodes((char*)luts, 1, 1, &nodes[0][0]);
+  struct DieInfo info;
+  info.xMax = 1;
+  info.yMax = 1;
+  info.nodes = (struct Node*)&nodes;
+  int retVal = initNodes((char*)luts, &info);
   CU_ASSERT_EQUAL_FATAL(nodes[0][0].x, 0);
   CU_ASSERT_EQUAL_FATAL(nodes[0][0].y, 0);
   CU_ASSERT_EQUAL_FATAL(nodes[0][0].lut[31], 31);
@@ -68,7 +72,11 @@ void test_initNodes(void){
     {OFF_GATE, OFF_GATE, OFF_GATE}
   };
   struct Node nodes2[3][3];
-  retVal = initNodes((char*)luts2, 3, 3, &nodes2[0][0]);
+  struct DieInfo info2;
+  info2.xMax = 3;
+  info2.yMax = 3;
+  info2.nodes = (struct Node*)&nodes2;
+  retVal = initNodes((char*)luts2, &info2);
   CU_ASSERT_EQUAL_FATAL(nodes2[1][1].x, 1);
   CU_ASSERT_EQUAL_FATAL(nodes2[1][1].y, 1);
   CU_ASSERT_EQUAL_FATAL(nodes2[1][1].lut[0], 0);
