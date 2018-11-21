@@ -25,49 +25,53 @@ void printBank(char* bank, int r, int c){
 }
 
 int main(int argc, const char* argv[]){
-  char bank1[3][3] = {
-    { 0b00000, 0b00100, 0b00000 },
-    { 0b01000, 0b00001, 0b00010 },
-    { 0b00000, 0b10000, 0b00000 }
-  };
+  char bank1[10][5];
+  char bank2[10][5];
 
-  char bank2[3][3] = {
-    { 0b00000, 0b00000, 0b00000 },
-    { 0b00000, 0b00000, 0b00000 },
-    { 0b00000, 0b00000, 0b00000 }
-  };
+  for(int i = 0; i<10; i++){
+    for(int k = 0; k<5; k++){
+      bank1[i][k] = 0;
+      bank2[i][k] = 0;
+    }
+  }
 
-  char externalData[12] = {
-    0, 0, 0,
+  char externalData[26] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0,
     0,
     1,
-    0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0,
     0,
     0
   };
 
-  char luts[3][3][32] = {
-    {OFF_GATE, OFF_GATE, OFF_GATE},
-    {ON_GATE,  OR_GATE,  OFF_GATE},
-    {OFF_GATE, OFF_GATE, OR_GATE}
+  char luts[10][3][32] = {
+    {ON_GATE, ON_GATE, ON_GATE},
+    {OR_GATE, OR_GATE, OR_GATE},
+    {OR_GATE, OR_GATE, OR_GATE},
+    {OR_GATE, OR_GATE, OR_GATE},
+    {OR_GATE, OR_GATE, OR_GATE},
+    {OR_GATE, OR_GATE, OR_GATE},
+    {OR_GATE, OR_GATE, OR_GATE},
+    {OR_GATE, OR_GATE, OR_GATE},
+    {OR_GATE, OR_GATE, OR_GATE},
+    {OR_GATE, OR_GATE, OR_GATE}
   };
-  struct Node nodes[3][3];
+  struct Node nodes[10][3];
   struct DieInfo info;
-  info.xMax  = 3;
+  info.xMax  = 10;
   info.yMax  = 3;
   info.nodes = (struct Node*) &nodes;
   info.bankA = (char *) &bank1;
   info.bankB = (char *) &bank2;
   info.externalData = (char *) &externalData;
   initNodes((char *) luts, &info);
-  printBank(info.bankA, 3, 3);
-
+  printBank(info.bankA, 10, 3);
 
   updateAllNodes(&info, info.bankA, info.bankB);
-  printBank(info.bankB, 3, 3);
+  printBank(info.bankB, 10, 3);
 
   updateAllNodes(&info, info.bankB, info.bankA);
-  printBank(info.bankA, 3, 3);
+  printBank(info.bankA, 10, 3);
 }

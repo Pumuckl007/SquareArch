@@ -53,6 +53,50 @@ void test_getNodeOutput(void){
   CU_ASSERT_EQUAL_FATAL(retVal, 31);
 }
 
+void test_getNodeOutputNonSquare(void){
+  char bank1[2][3] = {
+    { 0b00000, 0b00100, 0b00000},
+    { 0b01000, 0b00001, 0b00010}
+  };
+
+  char bank2[2][3] = {
+    { 0b00000, 0b00000, 0b00000},
+    { 0b00000, 0b00000, 0b00000}
+  };
+
+  char externalData[10] = {
+    0, 0, 0,
+    1,
+    1,
+    0, 1, 0,
+    0,
+    0
+  };
+
+  char luts[2][3][32] = {
+    {OFF_GATE, OR_GATE, OR_GATE},
+    {ON_GATE, AND_GATE, OFF_GATE}
+  };
+  struct Node nodes[2][3];
+  struct DieInfo info;
+  info.xMax  = 2;
+  info.yMax  = 3;
+  info.nodes = (struct Node*) &nodes;
+  info.bankA = (char *) &bank1;
+  info.bankB = (char *) &bank2;
+  info.externalData = (char *) &externalData;
+  initNodes((char *) luts, &info);
+
+  char retVal = getNodeOutput(&( nodes[0][2] ), &info, (char *) &bank1);
+  CU_ASSERT_EQUAL_FATAL(retVal, 31);
+
+  retVal = getNodeOutput(&( nodes[0][0] ), &info, (char *) &bank1);
+  CU_ASSERT_EQUAL_FATAL(retVal, 0);
+
+  retVal = getNodeOutput(&( nodes[0][1] ), &info, (char *) &bank1);
+  CU_ASSERT_EQUAL_FATAL(retVal, 0);
+}
+
 void test_updateAllNodes(void){
   char bank1[3][3] = {
     { 0b00000, 0b00100, 0b00000 },
@@ -100,6 +144,61 @@ void test_updateAllNodes(void){
     { 0b00000, 0b00000, 0b11111 }
   };
   CU_ASSERT_NSTRING_EQUAL(info.bankB, &results, 9);
+
+}
+
+void test_updateAllNodesNonSquare(void){
+  char bank1[3][5] = {
+    { 0b00000, 0b00000, 0b00000, 0b00000, 0b00000 },
+    { 0b01000, 0b00001, 0b01010, 0b00000, 0b00000 },
+    { 0b00000, 0b10000, 0b00000, 0b00000, 0b00000 }
+  };
+
+  char bank2[3][5] = {
+    { 0b00000, 0b00000, 0b00000, 0b00000, 0b00000 },
+    { 0b00000, 0b00000, 0b00000, 0b00000, 0b00000 },
+    { 0b00000, 0b00000, 0b00000, 0b00000, 0b00000 }
+  };
+
+  char externalData[16] = {
+    0, 0, 0, 1, 1,
+    0,
+    1,
+    0,
+    0, 0, 0, 1, 1,
+    0,
+    0,
+    0
+  };
+
+  char luts[3][5][32] = {
+    {OFF_GATE, OFF_GATE, OFF_GATE, BOTTOM_GATE, TOP_GATE},
+    {ON_GATE, OR_GATE, ON_GATE, LEFT_GATE, RIGHT_GATE},
+    {OFF_GATE, OFF_GATE, OR_GATE, BOTTOM_GATE, TOP_GATE}
+  };
+  struct Node nodes[3][3];
+  struct DieInfo info;
+  info.xMax  = 3;
+  info.yMax  = 3;
+  info.nodes = (struct Node*) &nodes;
+  info.bankA = (char *) &bank1;
+  info.bankB = (char *) &bank2;
+  info.externalData = (char *) &externalData;
+  initNodes((char *) luts, &info);
+
+  updateAllNodes(&info, info.bankA, info.bankB);
+
+  char results[3][5] = {
+    { 0b00000, 0b00000, 0b00000, 0b00000, 0b11111 },
+    { 0b11111, 0b11111, 0b11111, 0b11111, 0b11111 },
+    { 0b00000, 0b00000, 0b11111, 0b11111, 0b00000 }
+  };
+
+  for(int r = 0 ;r<3; r++){
+    for(int c = 0; c<5; c++){
+      CU_ASSERT_EQUAL(info.bankB[r*5+c], results[r][c]);
+    }
+  }
 
 }
 
@@ -153,12 +252,22 @@ int testNode (){
     return CU_get_error();
   }
 
+  if(NULL == CU_add_test(pSuite, "Test Get Node Output With Non Square", test_getNodeOutput)){
+    CU_cleanup_registry();
+    return CU_get_error();
+  }
+
   if(NULL == CU_add_test(pSuite, "Test Init Nodes", test_initNodes)){
     CU_cleanup_registry();
     return CU_get_error();
   }
 
   if(NULL == CU_add_test(pSuite, "Test Update Nodes", test_updateAllNodes)){
+    CU_cleanup_registry();
+    return CU_get_error();
+  }
+
+  if(NULL == CU_add_test(pSuite, "Test Update Nodes Non Square", test_updateAllNodesNonSquare)){
     CU_cleanup_registry();
     return CU_get_error();
   }
