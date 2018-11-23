@@ -102,12 +102,15 @@ int updateAllNodes(struct DieInfo* info, char* readBank, char* writeBank){
 * @reutrn 0 on success
 */
 int initNodes(char* luts, struct DieInfo* info){
-  for(int w = 0; w < info->xMax; w++){
-    for(int h = 0; h < info->yMax; h++){
-      struct Node* currentNode = info->nodes + w + h * info->xMax;
-      currentNode->x   = w;
-      currentNode->y   = h;
-      currentNode->lut = luts + 32 * ( w + h * info->xMax );
+  for(int y = 0; y < info->yMax; y++){
+    for(int x = 0; x < info->xMax; x++){
+      struct Node* currentNode = info->nodes + x + y * info->xMax;
+      currentNode->x   = x;
+      currentNode->y   = y;
+      currentNode->lut = luts + 32 * ( x + y * info->xMax );
+      if(*luts != 0 || (x == 3 && y == 1)){
+        printf("here");
+      }
     }
   }
   return 0;

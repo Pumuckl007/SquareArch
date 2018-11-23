@@ -3,6 +3,18 @@
 #include <stdio.h>
 #include "node.c"
 #include "SquareArchStructs.h"
+#include "BinaryPrinting.h"
+
+void assertArrays(char* actual, char* expected, int len){
+  for(int i = 0; i < len; i++){
+    CU_ASSERT_EQUAL(actual[i], expected[i]);
+    if(actual[i] != expected[i]){
+      printf("Expected "BYTE_TO_BINARY_PATTERN, BYTE_TO_BINARY(expected[i]));
+      printf(" but got "BYTE_TO_BINARY_PATTERN, BYTE_TO_BINARY(actual[i]));
+      printf(" at %d.\n", i);
+    }
+  }
+}
 
 void test_getNodeOutput(void){
   char bank1[3][3] = {
@@ -13,7 +25,7 @@ void test_getNodeOutput(void){
 
   char bank2[3][3] = {
     { 0b00000, 0b00000, 0b00000 },
-    { 0b00000, 0b00000, 0b00000 },
+    { 0b00001, 0b00000, 0b00000 },
     { 0b00000, 0b00000, 0b00000 }
   };
 
@@ -143,7 +155,7 @@ void test_updateAllNodes(void){
     { 0b11111, 0b11111, 0b00000 },
     { 0b00000, 0b00000, 0b11111 }
   };
-  CU_ASSERT_NSTRING_EQUAL(info.bankB, &results, 9);
+  assertArrays(info.bankB, &results[0][0], 9);
 
 }
 
@@ -171,14 +183,18 @@ void test_updateAllNodesNonSquare(void){
     0
   };
 
+  char lutTest[32] = OFF_GATE;
+
+
   char luts[3][5][32] = {
     {OFF_GATE, OFF_GATE, OFF_GATE, BOTTOM_GATE, TOP_GATE},
     {ON_GATE, OR_GATE, ON_GATE, LEFT_GATE, RIGHT_GATE},
     {OFF_GATE, OFF_GATE, OR_GATE, BOTTOM_GATE, TOP_GATE}
   };
-  struct Node nodes[3][3];
+
+  struct Node nodes[3][5];
   struct DieInfo info;
-  info.xMax  = 3;
+  info.xMax  = 5;
   info.yMax  = 3;
   info.nodes = (struct Node*) &nodes;
   info.bankA = (char *) &bank1;
@@ -194,11 +210,7 @@ void test_updateAllNodesNonSquare(void){
     { 0b00000, 0b00000, 0b11111, 0b11111, 0b00000 }
   };
 
-  for(int r = 0 ;r<3; r++){
-    for(int c = 0; c<5; c++){
-      CU_ASSERT_EQUAL(info.bankB[r*5+c], results[r][c]);
-    }
-  }
+  assertArrays(info.bankB, &results[0][0], 15);
 
 }
 
@@ -252,7 +264,9 @@ int testNode (){
     return CU_get_error();
   }
 
-  if(NULL == CU_add_test(pSuite, "Test Get Node Output With Non Square", test_getNodeOutput)){
+  if(NULL ==
+     CU_add_test(pSuite, "Test Get Node Output With Non Square",
+                 test_getNodeOutput)){
     CU_cleanup_registry();
     return CU_get_error();
   }
@@ -267,7 +281,9 @@ int testNode (){
     return CU_get_error();
   }
 
-  if(NULL == CU_add_test(pSuite, "Test Update Nodes Non Square", test_updateAllNodesNonSquare)){
+  if(NULL ==
+     CU_add_test(pSuite, "Test Update Nodes Non Square",
+                 test_updateAllNodesNonSquare)){
     CU_cleanup_registry();
     return CU_get_error();
   }
