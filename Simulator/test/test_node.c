@@ -1,7 +1,7 @@
 #include <CUnit/Basic.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include "node.c"
+#include "node.h"
 #include "SquareArchStructs.h"
 #include "BinaryPrinting.h"
 
