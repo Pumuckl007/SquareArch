@@ -108,9 +108,6 @@ int initNodes(char* luts, struct DieInfo* info){
       currentNode->x   = x;
       currentNode->y   = y;
       currentNode->lut = luts + 32 * ( x + y * info->xMax );
-      if(*luts != 0 || (x == 3 && y == 1)){
-        printf("here");
-      }
     }
   }
   return 0;
